@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="text"></div>
+    <input type="text" id="dulieu" />
+    <button id="send">click</button>
+    <!-- <input type="submit" /> -->
+
+    <script src="socket.io/socket.io.js"></script>
+    <script>
+      const socket = io("http://localhost:8081");
+      let dulieu = document.querySelector("#dulieu");
+      let btn = document.querySelector("#send");
+      let namer = prompt("Enter your name: ");
+      console.log(namer);
+
+      socket.on("connect", () => {
+        socket.emit("set-name", namer);
+      });
+
+      btn.addEventListener("click", () => {
+        socket.emit("clientSend-data", dulieu.value);
+        dulieu.value = "";
+      });
+
+      socket.on("serverSend-data", function (data) {
+        let text = document.querySelector("#text");
+        let li = document.createElement("li");
+        li.textContent = `${data.name} : ${data.message}`;
+        text.appendChild(li);
+      });
+
+      let userApi = `http://localhost:3000/user`;
+      let callApi = async () => {
+        let layapi = await fetch(userApi);
+        let data = await layapi.json();
+        console.log(data);
+        return data;
+      };
+
+      callApi();
+    </script>
+  </body>
+</html>
